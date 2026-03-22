@@ -1,0 +1,126 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Organization {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String   @unique
+  domain      String?  @unique
+  industry    String?
+  status      String   @default("ACTIVE")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  users       User[]
+  vendors     Vendor[]
+  requests    Request[]
+  chatMessages ChatMessage[]
+}
+
+model User {
+  id            String     @id @default(auto()) @map("_id") @db.ObjectId
+  organizationId String    @db.ObjectId
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  name          String
+  email         String     @unique
+  password      String
+  role          String     @default("EMPLOYEE") // ADMIN, PROCUREMENT_OFFICER, FINANCE_MANAGER, EMPLOYEE
+  position      String     @default("Strategic Procurement Analyst")
+  employeeId    String?    @unique
+  avatar        String?
+  department    String
+  phone         String?
+  isVerified    Boolean    @default(true)
+  verificationCode String?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  requests      Request[]
+  approvals     Approval[]
+  chatMessages  ChatMessage[]
+}
+
+model Vendor {
+  id            String     @id @default(auto()) @map("_id") @db.ObjectId
+  organizationId String    @db.ObjectId
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  name          String
+  contact       String
+  email         String
+  phone         String?
+  location      String?
+  category      String
+  paymentTerms  String
+  status        String @default("ACTIVE")
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  requests      Request[]
+  purchaseOrders PurchaseOrder[]
+}
+
+model Request {
+  id            String     @id @default(auto()) @map("_id") @db.ObjectId
+  organizationId String    @db.ObjectId
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  title         String
+  description   String
+  amount        Float
+  currency      String    @default("USD")
+  department    String
+  urgency       String    @default("MEDIUM")
+  status        String @default("DRAFT")
+  createdById   String     @db.ObjectId
+  createdBy     User       @relation(fields: [createdById], references: [id])
+  vendorId      String?    @db.ObjectId
+  vendor        Vendor?    @relation(fields: [vendorId], references: [id])
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  approvals     Approval[]
+  purchaseOrder PurchaseOrder?
+}
+
+model Approval {
+  id            String     @id @default(auto()) @map("_id") @db.ObjectId
+  requestId     String     @db.ObjectId
+  request       Request    @relation(fields: [requestId], references: [id])
+  approverId    String     @db.ObjectId
+  approver      User       @relation(fields: [approverId], references: [id])
+  status        String @default("PENDING")
+  comment       String?
+  date          DateTime   @default(now())
+}
+
+model PurchaseOrder {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  requestId   String   @unique @db.ObjectId
+  request     Request  @relation(fields: [requestId], references: [id])
+  poNumber    String   @unique
+  vendorId    String   @db.ObjectId
+  vendor      Vendor   @relation(fields: [vendorId], references: [id])
+  amount      Float
+  currency    String   @default("USD")
+  date        DateTime @default(now())
+}
+
+model ChatMessage {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  organizationId String  @db.ObjectId
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  userId        String   @db.ObjectId
+  user          User     @relation(fields: [userId], references: [id])
+  role          String   // 'user' or 'assistant'
+  content       String
+  createdAt     DateTime @default(now())
+}
+
+// Standardized values: Role (ADMIN, MANAGER, FINANCE, EMPLOYEE), 
+// VendorStatus (ACTIVE, INACTIVE), 
+// Urgency (LOW, MEDIUM, HIGH), 
+// RequestStatus (DRAFT, SUBMITTED, APPROVED, REJECTED, PO_CREATED),
+// ApprovalStatus (PENDING, APPROVED, REJECTED)

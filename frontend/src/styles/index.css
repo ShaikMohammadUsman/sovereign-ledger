@@ -1,0 +1,165 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+
+  --color-brand-bg: #0B0E14;
+  --color-brand-sidebar: #10141D;
+  --color-brand-card: #181D29;
+  --color-brand-border: #232A39;
+  --color-brand-accent: #FBB03B;
+  --color-brand-text-primary: #FFFFFF;
+  --color-brand-text-secondary: #A0AEC0;
+
+  --radius-lg: 0.5rem;
+  --radius-md: calc(0.5rem - 2px);
+  --radius-sm: calc(0.5rem - 4px);
+}
+
+@layer base {
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+  * {
+    border-color: var(--color-brand-border);
+  }
+  
+  body {
+    background-color: var(--color-brand-bg);
+    color: var(--color-brand-text-primary);
+    font-family: var(--font-sans);
+  }
+}
+
+/* Custom premium styles */
+.glass {
+  background: rgba(24, 29, 41, 0.7);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glow-primary {
+  box-shadow: 0 0 20px rgba(251, 176, 59, 0.2);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, #FFF 0%, #FBB03B 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@media print {
+  /* Ultra-aggressive hiding of UI chrome */
+  #app-sidebar, 
+  #app-header, 
+  #po-actions,
+  aside,
+  header:not(.print-only),
+  footer,
+  nav,
+  button,
+  .no-print {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    position: absolute !important;
+    left: -9999px !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+
+  /* Reset layout for clean document flow but preserve internal alignment */
+  html, body, #root {
+    position: static !important;
+    background: white !important;
+    color: black !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: auto !important;
+    overflow: visible !important;
+    display: block !important;
+  }
+
+  main {
+    display: block !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Preserve Flex and Grid alignment inside the document */
+  .print-stay {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    background: white !important;
+  }
+
+  .print-stay .flex, 
+  .print-stay .grid {
+    display: flex !important;
+  }
+
+  .print-stay .grid-cols-2 {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 20px !important;
+  }
+
+  .print-stay .grid-cols-12 {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 30px !important;
+  }
+
+  /* Specific styling for the PO document in print */
+  .glass {
+    background: white !important;
+    border: 1px solid #E2E8F0 !important;
+    color: black !important;
+    backdrop-filter: none !important;
+    margin-bottom: 20px !important;
+    box-shadow: none !important;
+  }
+
+  h1, h2, h3, p, span, td, th {
+    color: black !important;
+  }
+
+  .text-brand-accent {
+    color: #FBB03B !important;
+  }
+
+  .text-brand-text-secondary {
+    color: #4A5568 !important;
+  }
+
+  /* Table alignment cleanup */
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+  }
+
+  th, td {
+    border-bottom: 1px solid #EDF2F7 !important;
+  }
+
+  /* Official Print Header Restoration */
+  .print-only {
+    display: flex !important;
+    visibility: visible !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    background: white !important;
+    color: black !important;
+    border-bottom: 2px solid black !important;
+    width: 100% !important;
+    padding-bottom: 15px !important;
+    margin-bottom: 30px !important;
+  }
+
+  @page {
+    margin: 1.5cm;
+  }
+}
+
