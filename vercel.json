@@ -28,11 +28,16 @@
       "dest": "/backend/src/index.ts"
     },
     {
-      "handle": "filesystem"
+      "src": "/assets/(.*)",
+      "dest": "/frontend/dist/assets/$1"
+    },
+    {
+      "src": "/(.*\\.(css|js|svg|ico|png|jpg|jpeg|gif|webp|woff|woff2|ttf|map))",
+      "dest": "/frontend/dist/$1"
     },
     {
       "src": "/(.*)",
-      "dest": "/index.html"
+      "dest": "/frontend/dist/index.html"
     }
   ]
 }
