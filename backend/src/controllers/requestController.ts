@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { prisma } from '../prisma';
+import { syncVendorToZohoIfConnected } from '../utils/zohoSync';
 
 export const createRequest = async (req: any, res: Response) => {
   const { title, description, amount, currency, department, urgency, vendor, status } = req.body;
@@ -21,6 +22,7 @@ export const createRequest = async (req: any, res: Response) => {
           vendorByName = await (prisma as any).vendor.create({
             data: { organizationId, name: vendor, contact: 'N/A', email: 'N/A', category: 'General', paymentTerms: 'Net 30' }
           });
+          syncVendorToZohoIfConnected(organizationId, vendorByName.id).catch(() => {});
         }
         vendorId = vendorByName.id;
       }
@@ -123,6 +125,7 @@ export const updateRequest = async (req: any, res: Response) => {
             v = await (prisma as any).vendor.create({
               data: { organizationId, name: vendor, contact: 'N/A', email: 'N/A', category: 'General', paymentTerms: 'Net 30' }
             });
+            syncVendorToZohoIfConnected(organizationId, v.id).catch(() => {});
           }
           vendorId = v.id;
         }

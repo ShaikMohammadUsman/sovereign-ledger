@@ -1,7 +1,12 @@
 import axios from 'axios';
 
+/** Same-origin /api on Vercel; full URL when frontend is hosted separately */
+const apiBaseURL =
+  import.meta.env.VITE_API_URL?.replace(/\/$/, '') ||
+  (import.meta.env.PROD ? '/api' : '/api');
+
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: apiBaseURL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -47,6 +52,21 @@ export const aiService = {
   getInsights: () => api.get('/ai/insights'),
   chat: (message: string) => api.post('/ai/chat', { message }),
   getHistory: () => api.get('/ai/chat/history'),
+};
+
+export const zohoService = {
+  getStatus: () => api.get('/zoho/status'),
+  getConnectUrl: () =>
+    api.get('/zoho/connect', { params: { returnUrl: window.location.origin } }),
+  disconnect: () => api.post('/zoho/disconnect'),
+  syncVendors: () => api.post('/zoho/sync/vendors'),
+  importVendorsFromZoho: () => api.post('/zoho/import/vendors'),
+  syncVendor: (id: string) => api.post(`/zoho/sync/vendors/${id}`),
+  syncPurchaseOrder: (id: string) => api.post(`/zoho/sync/purchase-orders/${id}`),
+  syncPoFinancials: (id: string) => api.post(`/zoho/sync/purchase-orders/${id}/financials`),
+  syncAllBills: () => api.post('/zoho/sync/bills'),
+  retryFailedPurchaseOrders: () => api.post('/zoho/sync/purchase-orders/retry-failed'),
+  regenerateWebhookSecret: () => api.post('/zoho/webhook/regenerate-secret'),
 };
 
 export default api;

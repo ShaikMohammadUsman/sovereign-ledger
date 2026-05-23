@@ -16,6 +16,16 @@ model Organization {
   domain      String?  @unique
   industry    String?
   status      String   @default("ACTIVE")
+  // Zoho Books OAuth (per-tenant)
+  zohoRefreshToken         String?
+  zohoAccessToken          String?
+  zohoAccessTokenExpiresAt DateTime?
+  zohoBooksOrganizationId  String?
+  zohoAccountsServer       String?   @default("accounts.zoho.com")
+  zohoApiDomain            String?   @default("www.zohoapis.com")
+  zohoConnectedAt          DateTime?
+  zohoWebhookSecret        String?
+  zohoDefaultPurchaseItemId String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   users       User[]
@@ -58,6 +68,9 @@ model Vendor {
   category      String
   paymentTerms  String
   status        String @default("ACTIVE")
+  zohoContactId String?
+  zohoLastSyncedAt DateTime?
+  zohoSyncError String?
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
   requests      Request[]
@@ -106,6 +119,14 @@ model PurchaseOrder {
   amount      Float
   currency    String   @default("USD")
   date        DateTime @default(now())
+  zohoPurchaseOrderId String?
+  zohoLastSyncedAt    DateTime?
+  zohoSyncError       String?
+  zohoBillId          String?
+  zohoBillStatus      String?
+  zohoPaymentStatus   String?
+  zohoBillAmount      Float?
+  zohoBillLastSyncedAt DateTime?
 }
 
 model ChatMessage {

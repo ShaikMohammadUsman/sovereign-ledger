@@ -1,5 +1,9 @@
 import { Request, Response } from 'express';
 import { prisma } from '../prisma';
+import {
+  syncPurchaseOrderFinancialsFromZoho,
+  syncPurchaseOrderToZohoIfConnected,
+} from '../utils/zohoSync';
 
 export const generatePO = async (req: Request, res: Response) => {
   const { requestId } = req.body;
@@ -71,7 +75,39 @@ export const generatePO = async (req: Request, res: Response) => {
       data: { status: 'PO_CREATED' },
     });
 
-    res.status(201).json(po);
+    const poWithVendor = await (prisma as any).purchaseOrder.findUnique({
+      where: { id: po.id },
+      include: { vendor: true, request: true },
+    });
+
+    const zohoSync = await syncPurchaseOrderToZohoIfConnected(
+      request.organizationId,
+      po.id,
+      request.title
+    );
+
+    let zohoFinancials = null;
+    if (zohoSync.synced) {
+      try {
+        zohoFinancials = await syncPurchaseOrderFinancialsFromZoho(
+          request.organizationId,
+          po.id
+        );
+      } catch {
+        /* bill may not exist yet in Books */
+      }
+    }
+
+    const finalPo = await (prisma as any).purchaseOrder.findUnique({
+      where: { id: po.id },
+      include: { vendor: true, request: true },
+    });
+
+    res.status(201).json({
+      ...finalPo,
+      zohoSync,
+      zohoFinancials,
+    });
   } catch (error: any) {
     console.error('[PO Generation Error]:', error);
     res.status(500).json({ message: 'PO Generation Error: internal engine conflict.' });

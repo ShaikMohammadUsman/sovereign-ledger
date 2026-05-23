@@ -13,6 +13,7 @@ import {
 import { cn, formatCurrency } from '@/lib/utils';
 import { poService } from '@/services/api';
 import { useToast } from '@/context/ToastContext';
+import ZohoSyncPanel from '../components/ZohoSyncPanel';
 
 const PODetail: React.FC = () => {
   const { id } = useParams();
@@ -20,20 +21,20 @@ const PODetail: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const toast = useToast();
 
-  useEffect(() => {
-    if (id) {
-      const fetchPO = async () => {
-        try {
-          const res = await poService.getById(id);
-          setPo(res.data);
-        } catch (error) {
-          console.error("Failed to fetch PO details", error);
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchPO();
+  const fetchPO = async () => {
+    if (!id) return;
+    try {
+      const res = await poService.getById(id);
+      setPo(res.data);
+    } catch (error) {
+      console.error('Failed to fetch PO details', error);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  useEffect(() => {
+    fetchPO();
   }, [id]);
 
   if (loading) return <div className="text-white text-center py-20 font-bold tracking-widest uppercase">Loading Document...</div>;
@@ -215,6 +216,14 @@ const PODetail: React.FC = () => {
 
         {/* Sidebar Summary */}
         <div className="col-span-4 space-y-8 print:col-span-12 print:w-full print:space-y-8">
+          {id && (
+            <ZohoSyncPanel
+              type="po"
+              entityId={id}
+              data={po}
+              onUpdated={fetchPO}
+            />
+          )}
           <div className="glass rounded-2xl p-10 border border-brand-border bg-brand-card/30 space-y-10">
             <h3 className="text-[10px] font-bold tracking-widest uppercase text-brand-text-secondary border-b border-brand-border pb-4">
               Financial Summary

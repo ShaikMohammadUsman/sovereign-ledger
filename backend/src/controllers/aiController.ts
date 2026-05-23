@@ -2,13 +2,23 @@ import { Request, Response } from 'express';
 import { prisma } from '../prisma';
 import OpenAI from 'openai';
 
-// Initialize Azure OpenAI Client
-const aiClient = new OpenAI({
-  apiKey: process.env.AZURE_OPENAI_KEY,
-  baseURL: `${process.env.AZURE_OPENAI_ENDPOINT}/openai/deployments/${process.env.AZURE_DEPLOYMENT_NAME}`,
-  defaultQuery: { 'api-version': process.env.AZURE_API_VERSION },
-  defaultHeaders: { 'api-key': process.env.AZURE_OPENAI_KEY },
-});
+let aiClient: OpenAI | null = null;
+
+function getAiClient(): OpenAI | null {
+  const key = process.env.AZURE_OPENAI_KEY;
+  const endpoint = process.env.AZURE_OPENAI_ENDPOINT;
+  const deployment = process.env.AZURE_DEPLOYMENT_NAME;
+  if (!key || !endpoint || !deployment) return null;
+  if (!aiClient) {
+    aiClient = new OpenAI({
+      apiKey: key,
+      baseURL: `${endpoint}/openai/deployments/${deployment}`,
+      defaultQuery: { 'api-version': process.env.AZURE_API_VERSION || '2024-02-15-preview' },
+      defaultHeaders: { 'api-key': key },
+    });
+  }
+  return aiClient;
+}
 
 export const getAIInsights = async (req: any, res: Response) => {
   const organizationId = req.user.organizationId;
@@ -121,7 +131,14 @@ export const handleAIChat = async (req: any, res: Response) => {
       { role: 'user', content: message }
     ];
 
-    const completion = await aiClient.chat.completions.create({
+    const client = getAiClient();
+    if (!client) {
+      return res.status(503).json({
+        message: 'AI is not configured. Add AZURE_OPENAI_* variables to backend/.env',
+      });
+    }
+
+    const completion = await client.chat.completions.create({
       model: process.env.AZURE_DEPLOYMENT_NAME || 'gpt-4o-mini',
       messages,
       temperature: 0.7,

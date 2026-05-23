@@ -13,6 +13,7 @@ import PODetail from './pages/PODetail';
 import AIInsights from './pages/AIInsights';
 import Analytics from './pages/Analytics';
 import GlobalSourcing from './pages/GlobalSourcing';
+import Settings from './pages/Settings';
 import MainLayout from './components/Layout/MainLayout';
 import { useAuth } from './context/AuthContext';
 
@@ -43,6 +44,7 @@ function App() {
                   <Route path="/ai-insights" element={<AIInsights />} />
                   <Route path="/analytics" element={<Analytics />} />
                   <Route path="/global-sourcing" element={<GlobalSourcing />} />
+                  <Route path="/settings" element={<Settings />} />
                 </Routes>
               </MainLayout>
             ) : (

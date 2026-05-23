@@ -5,47 +5,29 @@ A high-performance, full-stack procurement management platform with real-time 3D
 ## 🛠️ Tech Stack
 - **Frontend**: React (Vite), Tailwind CSS, Framer Motion, Lucide-React
 - **3D Visualization**: `react-globe.gl` (Three.js WebGL Engine)
-- **Backend**: Node.js (Express), Prisma ORM, PostgreSQL/SQLite
-- **UI Components**: Radix UI (Glassmorphism), Lucide-React Icons
+- **Backend**: Node.js (Express), Prisma ORM, **MongoDB Atlas**
+- **Integrations**: Zoho Books (OAuth, PO/vendor sync, webhooks)
 
 ---
 
-## 🚀 Quick Start (Local Setup)
+## 🚀 Quick Start (Local — test here first)
 
-Anyone can run this project by following these steps:
-
-### 1. Repository Preparation
 ```bash
-git clone https://github.com/ShaikMohammadUsman/Procurement_System.git
-cd Procurement_System
-```
-
-### 2. Backend Infrastructure
-Navigate to the `backend` folder and prepare your environment:
-```bash
-cd backend
-npm install
-```
-Create a `.env` file in the `backend` directory:
-```env
-PORT=5001
-DATABASE_URL="file:./dev.db" # Or your PostgreSQL URL
-JWT_SECRET="your-tactical-secret-key"
-```
-Initialize the Database:
-```bash
-npx prisma migrate dev --name init
-npm run dev
+git clone https://github.com/ShaikMohammadUsman/procurement-final-.git
+cd procurement-final-
+npm run install:all
+cp backend/.env.example backend/.env   # add DATABASE_URL, JWT_SECRET, ZOHO_*
+cd backend && npx prisma generate && npx prisma db push
+cd .. && npm run dev
 ```
 
-### 3. Frontend Tactical Interface
-Navigate to the `frontend` folder and fire up the UI:
-```bash
-cd ../frontend
-npm install
-npm run dev
-```
-Open **[localhost:5173](http://localhost:5173)** in your browser.
+| App | URL |
+|-----|-----|
+| UI | http://localhost:3000 |
+| API | http://localhost:5001 |
+| Health | http://localhost:5001/health |
+
+**Production deploy:** see [DEPLOYMENT.md](./DEPLOYMENT.md)
 
 ---
 

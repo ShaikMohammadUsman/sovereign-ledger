@@ -87,14 +87,19 @@ const RequestDetail: React.FC = () => {
       if (id) {
         const res = await poService.generate(id);
         if (res.data) {
-          toast.success(`PURCHASE ORDER EMITTED: ${res.data.poNumber}`, 'GENERATION COMPLETE');
+          toast.success(`Purchase order ${res.data.poNumber} created.`, 'PO created');
+          if (res.data.zohoSync?.synced) {
+            toast.success('Synced to Zoho Books.', 'Zoho Books');
+          } else if (res.data.zohoSync?.error) {
+            toast.error(res.data.zohoSync.error, 'Zoho sync — check Settings');
+          }
           const updatedRequestResp = await requestService.getById(id);
           setRequest(updatedRequestResp.data);
         }
       }
     } catch (err: any) {
       const msg = err.response?.data?.message || 'Failed to generate PO. It might already exist.';
-      toast.error(msg, 'GENERATION HALTED');
+      toast.error(msg, 'PO failed');
     }
   };
 

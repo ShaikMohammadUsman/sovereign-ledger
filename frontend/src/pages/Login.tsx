@@ -45,12 +45,18 @@ const Login: React.FC = () => {
       toast.success('Clearance Level Confirmed. Welcome back to the Ledger.', 'IDENTITY VERIFIED');
       navigate('/');
     } catch (err: any) {
+      const msg = err.response?.data?.message || 'Login failed. Check email and password.';
       if (err.response?.status === 403 && err.response?.data?.requiresVerification) {
-        toast.info('IDENTITY HELD: verification code required.', 'SECURE VERIFICATION');
+        const devCode = err.response?.data?.devCode;
+        toast.info(
+          devCode ? `Dev mode: your PIN is ${devCode}` : 'Enter the verification code sent to your phone.',
+          'VERIFICATION REQUIRED'
+        );
+        if (devCode) setOtp(devCode);
         setShowOtp(true);
       } else {
-        setError(err.response?.data?.message || 'Verification failed. Credentials invalid.');
-        toast.error('Identity Verification Failed. Check record integrity.', 'ACCESS DENIED');
+        setError(msg);
+        toast.error(msg, 'ACCESS DENIED');
       }
     } finally {
       setLoading(false);

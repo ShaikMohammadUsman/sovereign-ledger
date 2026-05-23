@@ -305,7 +305,12 @@ const CreateRequest: React.FC = () => {
                           <Building className={cn("w-4 h-4 text-brand-text-secondary/50 group-hover:text-brand-accent", formData.vendor === v.id ? "text-brand-accent" : "")} />
                         </div>
                         <div className="text-left">
-                          <p className={cn("text-[10px] font-black tracking-widest uppercase", formData.vendor === v.id ? "text-brand-accent" : "text-white group-hover:text-brand-accent")}>{v.name}</p>
+                          <p className={cn("text-[10px] font-black tracking-widest uppercase", formData.vendor === v.id ? "text-brand-accent" : "text-white group-hover:text-brand-accent")}>
+                            {v.name}
+                            {v.zohoContactId && (
+                              <span className="ml-2 text-[7px] text-emerald-400/80 normal-case tracking-normal">· Zoho</span>
+                            )}
+                          </p>
                           <p className="text-[8px] text-brand-text-secondary/60 uppercase tracking-widest">{v.category || 'Vendor'}</p>
                         </div>
                       </button>
